@@ -1,26 +1,24 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { deleteTopic } from '@/actions/topicActions'
 import React from 'react'
 import { HiOutlineTrash } from 'react-icons/hi'
 
 export default function RemoveBtn({ id }: { id: string }) {
-  const router = useRouter()
-
   async function removeTopic() {
-    const confirmed = confirm(`Are you sure to delete the topic of ${id}?`)
+    const confirmed = confirm(`${id} - 이 토픽을 지울까요?`)
     if (confirmed) {
-      const res = await fetch(`/api/topics?id=${id}`, {
-        method: 'DELETE',
-      })
-      if (res.ok) {
-        router.refresh()
+      try {
+        await deleteTopic(id)
+      } catch (error) {
+        console.error('삭제 중 오류 발생: ', error)
+        alert('삭제 중 오류 발생')
       }
     }
   }
 
   return (
-    <button className="text-red-400" onClick={removeTopic}>
+    <button className="text-red-500" onClick={removeTopic}>
       <HiOutlineTrash size={24} />
     </button>
   )
