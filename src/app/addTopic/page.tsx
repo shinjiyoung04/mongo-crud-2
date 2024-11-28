@@ -1,9 +1,15 @@
 'use client'
+
 import { useSession } from 'next-auth/react'
 import { redirect, useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 
 export default function AddTopicPage() {
+  const { data: session } = useSession()
+  if (!session) {
+    redirect('/login')
+  }
+
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const router = useRouter()
@@ -32,17 +38,6 @@ export default function AddTopicPage() {
     }
   }
 
-  const { status, data: session } = useSession()
-
-  // 로딩 상태일 때는 로딩 메시지를 보여줍니다.
-  if (status === 'loading') {
-    return <div>Loading...</div>
-  }
-
-  if (!session) {
-    redirect('/login')
-  }
-
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
       <input
@@ -63,7 +58,7 @@ export default function AddTopicPage() {
         }
       />
       <button
-        className="bg-yellow-200 text-black font-bold px-6 py-3 w-fit rounded-md"
+        className="bg-green-800 text-white font-bold px-6 py-3 w-fit rounded-md"
         type="submit"
       >
         Add Topic
