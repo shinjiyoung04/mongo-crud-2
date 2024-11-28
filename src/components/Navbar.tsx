@@ -17,7 +17,7 @@ export default function Navbar() {
       </Link>
       <Link
         href="/addTopic"
-        className="bg-green-700 text-lg font-bold px-4 py-2 rounded-md"
+        className="bg-green-700 text-black font-bold px-4 py-2 rounded-md"
       >
         Add Topic
       </Link>
