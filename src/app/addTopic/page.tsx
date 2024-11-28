@@ -1,6 +1,6 @@
 'use client'
-
-import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import { redirect, useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 
 export default function AddTopicPage() {
@@ -30,6 +30,17 @@ export default function AddTopicPage() {
     } catch (error) {
       console.log(error)
     }
+  }
+
+  const { status, data: session } = useSession()
+
+  // 로딩 상태일 때는 로딩 메시지를 보여줍니다.
+  if (status === 'loading') {
+    return <div>Loading...</div>
+  }
+
+  if (!session) {
+    redirect('/login')
   }
 
   return (

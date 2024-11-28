@@ -1,4 +1,6 @@
 import EditTopicForm from '@/components/EditTopicForm'
+import { auth } from '@/auth'
+import { redirect } from 'next/navigation'
 
 const apiUrl = process.env.API_URL
 
@@ -21,8 +23,18 @@ export default async function EditTopic({
 }: {
   params: { id: string }
 }) {
-  const { id } = await params
+  // 서버에서 세션을 확인
+  const session = await auth()
+  if (!session) {
+    redirect('/login')
+  }
+
+  // ID에 해당하는 주제를 서버에서 가져옴
+  const { id } = params
   const { topic } = await getTopicById(id)
+  if (!topic) {
+    return <div>Topic not found</div> // 주제를 찾을 수 없을 경우
+  }
   const { title, description } = topic
 
   return <EditTopicForm id={id} title={title} description={description} />
