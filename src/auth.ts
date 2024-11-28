@@ -1,50 +1,34 @@
-import NextAuth from 'next-auth'
-import Github from 'next-auth/providers/github'
-import Google from 'next-auth/providers/google'
-import connectMongoDB from './libs/mongodb'
-import User from './models/user'
+import { getToken } from 'next-auth/jwt'
+import { NextRequest, NextResponse } from 'next/server'
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [Google, Github],
-  pages: {
-    signIn: '/login',
+// Middleware 처리
+export const middleware = async (req: NextRequest) => {
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+    raw: true,
+  })
+  const { pathname } = req.nextUrl
+
+  if (pathname.startsWith('/auth')) {
+    if (token) {
+      return NextResponse.redirect(new URL('/', req.url))
+    }
+  }
+}
+
+// 핸들러 정의
+export const handlers = {
+  GET: async (req: NextRequest) => {
+    // GET 요청 처리 로직
+    return NextResponse.json({ message: 'GET request to /auth' })
   },
-  callbacks: {
-    async signIn({ user, account }) {
-      const apiUrl = process.env.API_URL
-      const { name, email } = user
-      if (account?.provider === 'google' || account?.provider === 'github') {
-        try {
-          await connectMongoDB()
-          const userExists = await User.findOne({ email })
-          if (!userExists) {
-            const res = await fetch(`${apiUrl}/api/user`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ name, email }),
-            })
-            if (res.ok) {
-              return true
-            }
-          }
-          const res1 = await fetch(`${apiUrl}/api/log`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email }),
-          })
-          if (res1.ok) {
-            return true
-          }
-        } catch (error) {
-          console.log(error)
-          return false
-        }
-      }
-      return true
-    },
+  POST: async (req: NextRequest) => {
+    // POST 요청 처리 로직
+    return NextResponse.json({ message: 'POST request to /auth' })
   },
-})
+}
+
+export const config = {
+  matcher: ['/auth/:path*'],
+}

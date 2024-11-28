@@ -1,4 +1,4 @@
 import { handlers } from '@/auth'
 
-// Referring to the auth.ts we just created
+// GET, POST 요청 핸들러 사용
 export const { GET, POST } = handlers
