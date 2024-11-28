@@ -5,14 +5,12 @@ import User from '@/models/user'
 export async function POST(req: NextRequest) {
   const { user } = await req.json()
   const { name, email } = user
-
   try {
     await connectMongoDB()
     const userExists = await User.findOne({ email })
     if (!userExists) {
       await User.create({ name, email })
     }
-
     // Log the login event
     const apiUrl = process.env.API_URL
     await fetch(`${apiUrl}/api/log`, {

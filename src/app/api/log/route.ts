@@ -9,6 +9,6 @@ export async function POST(request: NextRequest) {
     await Log.create({ email })
     return NextResponse.json({ message: 'Login event logged' }, { status: 201 })
   } catch (error) {
-    console.error('Error logging login event:', error)
+    console.error('Error in logging login event: ', error)
   }
 }

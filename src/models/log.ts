@@ -1,12 +1,11 @@
-import mongoose from 'mongoose'
-import monggose, { Schema } from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
+
 const logSchema = new Schema(
   {
-    eamil: { type: String, required: true },
+    email: { type: String, required: true },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 )
+
 const Log = mongoose.models.Log || mongoose.model('Log', logSchema)
 export default Log
