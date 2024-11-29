@@ -1,7 +1,11 @@
-// next.config.mjs
-
 // Next.js 구성 설정
 const nextConfig = {
+  // React Strict Mode 활성화
+  reactStrictMode: true,
+
+  // SWC Minify 활성화 (빠른 빌드)
+  swcMinify: true,
+
   // 이미지 설정: 원격 이미지 로드 패턴 설정
   images: {
     remotePatterns: [
@@ -18,8 +22,23 @@ const nextConfig = {
     ],
   },
 
-  // 여기서 추가적인 Next.js 설정을 할 수 있습니다
-  // 예: Webpack 설정, 환경 변수, 페이지 리디렉션 등
+  // Webpack 설정
+  webpack: (config, { isServer }) => {
+    // 특정 서버-클라이언트 차이 작업을 처리하고 싶다면 여기에 작성
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false, // 'fs' 모듈 비활성화 (클라이언트에서 사용 불가)
+      }
+    }
+    return config
+  },
+
+  // 환경 변수 설정
+  env: {
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    API_URL: process.env.API_URL,
+  },
 }
 
 export default nextConfig

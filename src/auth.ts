@@ -1,34 +1,32 @@
-import { getToken } from 'next-auth/jwt'
-import { NextRequest, NextResponse } from 'next/server'
+import NextAuth from 'next-auth'
+import Github from 'next-auth/providers/github'
+import Google from 'next-auth/providers/google'
 
-// Middleware 처리
-export const middleware = async (req: NextRequest) => {
-  const token = await getToken({
-    req,
-    secret: process.env.NEXTAUTH_SECRET,
-    raw: true,
-  })
-  const { pathname } = req.nextUrl
-
-  if (pathname.startsWith('/auth')) {
-    if (token) {
-      return NextResponse.redirect(new URL('/', req.url))
-    }
-  }
-}
-
-// 핸들러 정의
-export const handlers = {
-  GET: async (req: NextRequest) => {
-    // GET 요청 처리 로직
-    return NextResponse.json({ message: 'GET request to /auth' })
+export const { handlers, signIn, signOut, auth } = NextAuth({
+  providers: [Google, Github],
+  pages: {
+    signIn: '/login',
   },
-  POST: async (req: NextRequest) => {
-    // POST 요청 처리 로직
-    return NextResponse.json({ message: 'POST request to /auth' })
+  callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === 'google' || account?.provider === 'github') {
+        try {
+          const apiUrl = process.env.API_URL
+          const res = await fetch(`${apiUrl}/api/user-auth`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user, account }),
+          })
+          if (res.ok) return true
+          return false
+        } catch (error) {
+          console.log(error)
+          return false
+        }
+      }
+      return true
+    },
   },
-}
-
-export const config = {
-  matcher: ['/auth/:path*'],
-}
+})
